@@ -66,16 +66,6 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
         TypeError: if `options` is supplied without `method`, or if `t` or `y0` has
             an invalid dtype.
     """
-
-    tensor_input, func, y0, t = _check_inputs(func, y0, t)
-
-    if options is None:
-        options = {}
-    elif method is None:
-        raise ValueError('cannot supply `options` without specifying `method`')
-
-    if method is None:
-        method = 'dopri5'
     try:
         print("started")
         if u is not None and isinstance(func, nn.Module):
@@ -89,6 +79,16 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
 
     except Exception as e:
         print(e)
+
+    tensor_input, func, y0, t = _check_inputs(func, y0, t)
+
+    if options is None:
+        options = {}
+    elif method is None:
+        raise ValueError('cannot supply `options` without specifying `method`')
+
+    if method is None:
+        method = 'dopri5'
 
     solver = SOLVERS[method](func, y0, rtol=rtol, atol=atol, **options)
     solution = solver.integrate(t)
