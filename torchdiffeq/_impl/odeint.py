@@ -78,7 +78,7 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
                 t_n = t_n.numpy()
             #print("reached new function")
             #print('time points',t_n)
-            func.control_sequences = interpolate.interp1d(t_n, u_n, fill_value='extrapolate')
+            func.control_sequences = interpolate.interp1d(t_n, u_n, fill_value='extrapolate', axis=0)
             print('done')
 
     except Exception as e:
