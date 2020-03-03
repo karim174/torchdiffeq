@@ -23,6 +23,7 @@ SOLVERS = {
     'adaptive_heun': AdaptiveHeunSolver,
 }
 
+
 def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None):
     """Integrate a system of ordinary differential equations.
 
@@ -53,7 +54,7 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
         options: optional dict of configuring options for the indicated integration
             method. Can only be provided if a `method` is explicitly set.
         name: Optional name for this operation.
-        
+
     Returns:
         y: Tensor, where the first dimension corresponds to different
             time points. Contains the solved value of y for each desired time point in
@@ -75,15 +76,20 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
 
     if method is None:
         method = 'dopri5'
-        
-    if u is not None and isinstance(func, nn.Module):
-        if torch.is_tensor(u):
-            u_n=u.numpy()
-        if torch.is_tensor(t):
-            t_n = t.numpy
-        print("reached new function")
-        func.control_sequences = interpolate.interp1(t,u_n)
-        
+    try:
+        print("started")
+        if u is not None and isinstance(func, nn.Module):
+
+            if torch.is_tensor(u):
+                u_n = u.numpy()
+            if torch.is_tensor(t):
+                t_n = t.numpy()
+            print("reached new function")
+            func.control_sequences = interpolate.interp1(t, u_n)
+
+    except Exception as e:
+        print(e)
+
     solver = SOLVERS[method](func, y0, rtol=rtol, atol=atol, **options)
     solution = solver.integrate(t)
 
