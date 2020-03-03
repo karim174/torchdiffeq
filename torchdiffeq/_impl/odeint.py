@@ -67,7 +67,7 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
             an invalid dtype.
     """
     try:
-        print("started")
+        #print("started")
         if u is not None and isinstance(func, nn.Module):
             u_n = u.clone()
             t_n = t.clone()
@@ -76,8 +76,8 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
                 u_n = u_n.numpy()
             if torch.is_tensor(t_n):
                 t_n = t_n.numpy()
-            print("reached new function")
-            print('time points',t_n)
+            #print("reached new function")
+            #print('time points',t_n)
             func.control_sequences = interpolate.interp1d(t_n, u_n, fill_value='extrapolate')
             print('done')
 
