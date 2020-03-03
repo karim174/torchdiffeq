@@ -81,7 +81,7 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
             u_n=u.numpy()
         if torch.is_tensor(t):
             t_n = t.numpy
-         print("reached new function")
+        print("reached new function")
         func.control_sequences = interpolate.interp1(t,u_n)
         
     solver = SOLVERS[method](func, y0, rtol=rtol, atol=atol, **options)
