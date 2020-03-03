@@ -69,13 +69,16 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
     try:
         print("started")
         if u is not None and isinstance(func, nn.Module):
-
-            if torch.is_tensor(u):
-                u_n = u.numpy()
-            if torch.is_tensor(t):
-                t_n = t.numpy()
+            u_n = u.copy()
+            t_n = t.copy()
+            
+            if torch.is_tensor(u_n):
+                u_n = u_n.numpy()
+            if torch.is_tensor(t_n):
+                t_n = t_n.numpy()
             print("reached new function")
-            func.control_sequences = interpolate.interp1(t, u_n)
+            
+            func.control_sequences = interpolate.interp1(t_n, u_n)
 
     except Exception as e:
         print(e)
