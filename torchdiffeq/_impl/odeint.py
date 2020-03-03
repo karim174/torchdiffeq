@@ -69,8 +69,8 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
     try:
         #print("started")
         if u is not None and isinstance(func, nn.Module):
-            u_n = u.clone()
-            t_n = t.clone()
+            u_n = u.detach().clone()
+            t_n = t.detach().clone()
             
             if torch.is_tensor(u_n):
                 u_n = u_n.numpy()
