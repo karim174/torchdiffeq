@@ -6,6 +6,9 @@ from .fixed_grid import Euler, Midpoint, RK4
 from .fixed_adams import AdamsBashforth, AdamsBashforthMoulton
 from .adams import VariableCoefficientAdamsBashforth
 from .misc import _check_inputs
+from scipy import interpolate
+import torch
+from torch import nn
 
 SOLVERS = {
     'explicit_adams': AdamsBashforth,
@@ -20,8 +23,7 @@ SOLVERS = {
     'adaptive_heun': AdaptiveHeunSolver,
 }
 
-
-def odeint(func, y0, t, rtol=1e-7, atol=1e-9, method=None, options=None):
+def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None):
     """Integrate a system of ordinary differential equations.
 
     Solves the initial value problem for a non-stiff system of first order ODEs:
@@ -41,6 +43,8 @@ def odeint(func, y0, t, rtol=1e-7, atol=1e-9, method=None, options=None):
             `y`. The initial time point should be the first element of this sequence,
             and each time must be larger than the previous time. May have any floating
             point dtype. Converted to a Tensor with float64 dtype.
+        u: (N+1)-D Tensor giving starting value of `u` at all time points. May
+            have any floating point or complex dtype.
         rtol: optional float64 Tensor specifying an upper bound on relative error,
             per element of `y`.
         atol: optional float64 Tensor specifying an upper bound on absolute error,
@@ -49,7 +53,7 @@ def odeint(func, y0, t, rtol=1e-7, atol=1e-9, method=None, options=None):
         options: optional dict of configuring options for the indicated integration
             method. Can only be provided if a `method` is explicitly set.
         name: Optional name for this operation.
-
+        
     Returns:
         y: Tensor, where the first dimension corresponds to different
             time points. Contains the solved value of y for each desired time point in
@@ -71,7 +75,12 @@ def odeint(func, y0, t, rtol=1e-7, atol=1e-9, method=None, options=None):
 
     if method is None:
         method = 'dopri5'
-
+        
+    if u is not None and isinstance(func, nn.Module):
+        if torch.is_tensor(u):
+            u_n=u.to_numpy()
+        func.control_sequences = interpolate.interp1(t,u_n)
+        
     solver = SOLVERS[method](func, y0, rtol=rtol, atol=atol, **options)
     solution = solver.integrate(t)
 
