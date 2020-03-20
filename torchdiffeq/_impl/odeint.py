@@ -21,7 +21,7 @@ SOLVERS = {
 }
 
 
-def odeint(func, y0, t, rtol=1e-7, atol=1e-9, method=None, options=None):
+def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None):
     """Integrate a system of ordinary differential equations.
     Solves the initial value problem for a non-stiff system of first order ODEs:
         ```
@@ -56,6 +56,27 @@ def odeint(func, y0, t, rtol=1e-7, atol=1e-9, method=None, options=None):
         TypeError: if `options` is supplied without `method`, or if `t` or `y0` has
             an invalid dtype.
     """
+    try:
+    #print("started")
+    if u is not None and isinstance(func, nn.Module):
+        u_n = u.detach().clone()
+        t_n = t.detach().clone()
+
+        if torch.is_tensor(u_n):
+            if  u_n.is_cuda:
+                u_n = u_n.cpu()
+            u_n = u_n.numpy()
+        if torch.is_tensor(t_n):
+            if  t_n.is_cuda:
+                t_n = t_n.cpu()
+            t_n = t_n.numpy()
+        #print("reached new function")
+        #print('time points',t_n)
+        func.control_sequences = interpolate.interp1d(t_n, u_n, fill_value='extrapolate', axis=0)
+        #print('done')
+
+    except Exception as e:
+    print(e)
 
     tensor_input, func, y0, t = _check_inputs(func, y0, t)
 
