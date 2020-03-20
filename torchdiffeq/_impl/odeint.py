@@ -6,9 +6,6 @@ from .fixed_grid import Euler, Midpoint, RK4
 from .fixed_adams import AdamsBashforth, AdamsBashforthMoulton
 from .adams import VariableCoefficientAdamsBashforth
 from .misc import _check_inputs
-from scipy import interpolate
-import torch
-from torch import nn
 
 SOLVERS = {
     'explicit_adams': AdamsBashforth,
@@ -24,17 +21,14 @@ SOLVERS = {
 }
 
 
-def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None):
+def odeint(func, y0, t, rtol=1e-7, atol=1e-9, method=None, options=None):
     """Integrate a system of ordinary differential equations.
-
     Solves the initial value problem for a non-stiff system of first order ODEs:
         ```
         dy/dt = func(t, y), y(t[0]) = y0
         ```
     where y is a Tensor of any shape.
-
     Output dtypes and numerical precision are based on the dtypes of the inputs `y0`.
-
     Args:
         func: Function that maps a Tensor holding the state `y` and a scalar Tensor
             `t` into a Tensor of state derivatives with respect to time.
@@ -44,8 +38,6 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
             `y`. The initial time point should be the first element of this sequence,
             and each time must be larger than the previous time. May have any floating
             point dtype. Converted to a Tensor with float64 dtype.
-        u: (N+1)-D Tensor giving starting value of `u` at all time points. May
-            have any floating point or complex dtype.
         rtol: optional float64 Tensor specifying an upper bound on relative error,
             per element of `y`.
         atol: optional float64 Tensor specifying an upper bound on absolute error,
@@ -54,39 +46,16 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
         options: optional dict of configuring options for the indicated integration
             method. Can only be provided if a `method` is explicitly set.
         name: Optional name for this operation.
-
     Returns:
         y: Tensor, where the first dimension corresponds to different
             time points. Contains the solved value of y for each desired time point in
             `t`, with the initial value `y0` being the first element along the first
             dimension.
-
     Raises:
         ValueError: if an invalid `method` is provided.
         TypeError: if `options` is supplied without `method`, or if `t` or `y0` has
             an invalid dtype.
     """
-    try:
-        #print("started")
-        if u is not None and isinstance(func, nn.Module):
-            u_n = u.detach().clone()
-            t_n = t.detach().clone()
-            
-            if torch.is_tensor(u_n):
-                if  u_n.is_cuda:
-                    u_n = u_n.cpu()
-                u_n = u_n.numpy()
-            if torch.is_tensor(t_n):
-                if  t_n.is_cuda:
-                    t_n = t_n.cpu()
-                t_n = t_n.numpy()
-            #print("reached new function")
-            #print('time points',t_n)
-            func.control_sequences = interpolate.interp1d(t_n, u_n, fill_value='extrapolate', axis=0)
-            #print('done')
-
-    except Exception as e:
-        print(e)
 
     tensor_input, func, y0, t = _check_inputs(func, y0, t)
 
