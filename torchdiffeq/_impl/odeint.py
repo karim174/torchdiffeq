@@ -58,22 +58,22 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
     """
     try:
     #print("started")
-    if u is not None and isinstance(func, nn.Module):
-        u_n = u.detach().clone()
-        t_n = t.detach().clone()
+        if u is not None and isinstance(func, nn.Module):
+            u_n = u.detach().clone()
+            t_n = t.detach().clone()
 
-        if torch.is_tensor(u_n):
-            if  u_n.is_cuda:
-                u_n = u_n.cpu()
-            u_n = u_n.numpy()
-        if torch.is_tensor(t_n):
-            if  t_n.is_cuda:
-                t_n = t_n.cpu()
-            t_n = t_n.numpy()
-        #print("reached new function")
-        #print('time points',t_n)
-        func.control_sequences = interpolate.interp1d(t_n, u_n, fill_value='extrapolate', axis=0)
-        #print('done')
+            if torch.is_tensor(u_n):
+                if  u_n.is_cuda:
+                    u_n = u_n.cpu()
+                u_n = u_n.numpy()
+            if torch.is_tensor(t_n):
+                if  t_n.is_cuda:
+                    t_n = t_n.cpu()
+                t_n = t_n.numpy()
+            #print("reached new function")
+            #print('time points',t_n)
+            func.control_sequences = interpolate.interp1d(t_n, u_n, fill_value='extrapolate', axis=0)
+            #print('done')
 
     except Exception as e:
     print(e)
