@@ -102,13 +102,35 @@ class OdeintAdjointMethod(torch.autograd.Function):
             return (*adj_y, None, time_vjps, adj_params, None, None, None, None, None)
 
 
-def odeint_adjoint(func, y0, t, rtol=1e-6, atol=1e-12, method=None, options=None):
+def odeint_adjoint(func, y0, t, u, rtol=1e-6, atol=1e-12, method=None, options=None):
 
     # We need this in order to access the variables inside this module,
     # since we have no other way of getting variables along the execution path.
     if not isinstance(func, nn.Module):
         raise ValueError('func is required to be an instance of nn.Module.')
+    try:
+    #print("started")
+    if u is not None:
+        u_n = u.detach().clone()
+        t_n = t.detach().clone()
 
+        if torch.is_tensor(u_n):
+            if  u_n.is_cuda:
+                u_n = u_n.cpu()
+            u_n = u_n.numpy()
+        if torch.is_tensor(t_n):
+            if  t_n.is_cuda:
+                t_n = t_n.cpu()
+            t_n = t_n.numpy()
+        #print("reached new function")
+        #print('time points',t_n)
+        #this is done to compatible with solvers that needs solutions in multiple timesteps
+        #but in turn needs the function to be solved follow the same 
+        func.control_sequences = interpolate.interp1d(t_n, u_n, fill_value='extrapolate', axis=0)
+        #print('done')
+
+    except Exception as e:
+        print(e)
     tensor_input = False
     if torch.is_tensor(y0):
 
