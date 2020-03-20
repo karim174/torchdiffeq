@@ -76,7 +76,7 @@ def odeint(func, y0, t, u=None, rtol=1e-7, atol=1e-9, method=None, options=None)
             #print('done')
 
     except Exception as e:
-    print(e)
+        print(e)
 
     tensor_input, func, y0, t = _check_inputs(func, y0, t)
 
