@@ -6,6 +6,7 @@ from .fixed_grid import Euler, Midpoint, RK4
 from .fixed_adams import AdamsBashforth, AdamsBashforthMoulton
 from .adams import VariableCoefficientAdamsBashforth
 from .misc import _check_inputs
+from scipy import interpolate
 
 SOLVERS = {
     'explicit_adams': AdamsBashforth,
