@@ -79,6 +79,7 @@ class OdeintAdjointMethod(torch.autograd.Function):
                 if adj_params.numel() == 0:
                     adj_params = torch.tensor(0.).to(adj_y[0])
                 aug_y0 = (*ans_i, *adj_y, adj_time, adj_params)
+                print(ans_i, adj_y, adj_time, adj_params)
                 aug_ans = odeint(
                     augmented_dynamics, aug_y0,
                     torch.tensor([t[i], t[i - 1]]), rtol=rtol, atol=atol, method=method, options=options
