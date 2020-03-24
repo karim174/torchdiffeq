@@ -127,7 +127,7 @@ def odeint_adjoint(func, y0, t, u, rtol=1e-6, atol=1e-12, method=None, options=N
             #print('time points',t_n)
             #this is done to compatible with solvers that needs solutions in multiple timesteps
             #but in turn needs the function to be solved follow the same 
-            func.control_sequences = interpolate.interp1d(t_n, u_n, fill_value='extrapolate', axis=0)
+            func.control_sequences = interpolate.interp1d(t_n, u_n, fill_value='extrapolate', axis=0, copy=True)
             #print('done')
 
     except Exception as e:
