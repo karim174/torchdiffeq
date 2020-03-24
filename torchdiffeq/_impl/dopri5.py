@@ -80,7 +80,7 @@ class Dopri5Solver(AdaptiveStepsizeODESolver):
             first_step = _select_initial_step(self.func, t[0], self.y0, 4, self.rtol[0], self.atol[0], f0=f0).to(t)
         else:
             first_step = _convert_to_tensor(self.first_step, dtype=t.dtype, device=t.device)
-        print('first step in before_integrate', t[0], first_step)
+        
         self.rk_state = _RungeKuttaState(self.y0, f0, t[0], t[0], first_step, interp_coeff=[self.y0] * 5)
 
     def advance(self, next_t):
@@ -119,6 +119,5 @@ class Dopri5Solver(AdaptiveStepsizeODESolver):
         dt_next = _optimal_step_size(
             dt, mean_sq_error_ratio, safety=self.safety, ifactor=self.ifactor, dfactor=self.dfactor, order=5
         )
-        print('in adaptive dopri5 step t0 and dt accept_step t_next', t0, dt, accept_step, t_next, dt_next)
         rk_state = _RungeKuttaState(y_next, f_next, t0, t_next, dt_next, interp_coeff)
         return rk_state
