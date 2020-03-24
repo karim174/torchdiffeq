@@ -119,12 +119,11 @@ def _select_initial_step(fun, t0, y0, order, rtol, atol, f0=None):
 
     rtol = rtol if _is_iterable(rtol) else [rtol] * len(y0)
     atol = atol if _is_iterable(atol) else [atol] * len(y0)
-
+    print('f0', f0)
     scale = tuple(atol_ + torch.abs(y0_) * rtol_ for y0_, atol_, rtol_ in zip(y0, atol, rtol))
-
     d0 = tuple(_norm(y0_ / scale_) for y0_, scale_ in zip(y0, scale))
     d1 = tuple(_norm(f0_ / scale_) for f0_, scale_ in zip(f0, scale))
-
+    print('scale', scale)
     if max(d0).item() < 1e-5 or max(d1).item() < 1e-5:
         h0 = torch.tensor(1e-6).to(t0)
     else:
