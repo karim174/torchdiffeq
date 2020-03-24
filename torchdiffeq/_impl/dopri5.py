@@ -80,8 +80,6 @@ class Dopri5Solver(AdaptiveStepsizeODESolver):
             first_step = _select_initial_step(self.func, t[0], self.y0, 4, self.rtol[0], self.atol[0], f0=f0).to(t)
         else:
             first_step = _convert_to_tensor(self.first_step, dtype=t.dtype, device=t.device)
-        
-		
 	print('first step in before_integrate', t[0], first_step)
         self.rk_state = _RungeKuttaState(self.y0, f0, t[0], t[0], first_step, interp_coeff=[self.y0] * 5)
 
