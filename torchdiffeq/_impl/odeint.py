@@ -7,6 +7,8 @@ from .fixed_adams import AdamsBashforth, AdamsBashforthMoulton
 from .adams import VariableCoefficientAdamsBashforth
 from .misc import _check_inputs
 from scipy import interpolate
+import torch
+import torch.nn as nn
 
 SOLVERS = {
     'explicit_adams': AdamsBashforth,
